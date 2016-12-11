@@ -10,13 +10,13 @@ public class NoteArray extends ResizingArray<Note> {
      */
     NoteArray() {
         numElements = 0;
-        data = new Note[1];
-        size = 1;
+        data = new Note[100];
+        size = 100;
     }
     
     @Override
     /**
-     * Copies the elements in data into a new, presumably larger array.
+     * Copies the elements in data into a new array.
      * @param newSize Size of the array to copy data array into.
      */
     protected void resize(int newSize) {

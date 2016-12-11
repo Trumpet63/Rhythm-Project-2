@@ -36,6 +36,14 @@ public abstract class ResizingArray<T> {
         }
     }
     
+    /**
+     * Reduces the size of the array to match the number of elements it is
+     * currently storing.
+     */
+    public void consolidate() {
+        resize(numElements);
+    }
+    
     // cannot create a new array in an abstract class unless you do something fancy
     /**
      * Copies the elements in data into a new, presumably larger array.

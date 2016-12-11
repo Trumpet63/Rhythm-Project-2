@@ -1,49 +1,114 @@
 package smparser;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 /*
  * Parses a .sm file
  */
 public class SMParser {
 
-    /**
-     * @param args the command line arguments
-     */
     public static void main() {
-        // testing time
-        NoteArray notes = new NoteArray();
+        String file = "Mother 3.sm"; // Can use any .sm file. Must be in the same folder.
+        Song song = new Song(file);
+        song.parse();
+        System.out.println(String.format("Headers Content:\n\tnumElements = %d\n\tsize = %d\n", song.headers.numElements, song.headers.size));
+        for(int i = 0; i < song.headers.numElements; i++) {
+            System.out.println(song.headers.data[i].toString());
+        }
         
-        Note note1 = new Note();
-        note1.time = 1;
-        note1.measureSize = 4;
-        note1.measurePosition = 3;
-        note1.columnNumber = 1;
+    }
+}
+
+/**
+ * The song object contains the methods necessary to parse a song's .sm file and
+ * stores the information therein.
+ */
+class Song {
+    public String fileName;
+    public HeaderArray headers;
+    
+    /**
+     * Constructs and initializes a song object
+     * @param fileName The name of the .sm file for the song.
+     */
+    Song(String fileName) {
+        this.fileName = fileName;
+    }
+    
+    /**
+     * Parses the .sm file associated with the song object.
+     */
+    public void parse() {
+        List<String> records = new ArrayList<>();
         
-        Note note2 = new Note();
-        note2.time = 2.5;
-        note2.measureSize = 8;
-        note2.measurePosition = 6;
-        note2.columnNumber = 3;
+        try {
+            BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            String line;
+            while((line = reader.readLine()) != null) {
+                records.add(line);
+            }
+            reader.close();
+        }
+        catch (FileNotFoundException ex) {
+            System.out.println("File not found");
+        } 
+        catch (IOException ex) {
+            System.out.println("IO exception");
+        }
         
-        notes.insert(note1);
-        notes.insert(note2);
+        int endOfHeader = parseHeader(records);
+    }
+    
+    /**
+     * Parses the block of # statements at the start of the .sm file and stores
+     * them in the headers array.
+     * @param records The .sm file broken into lines.
+     * @return The line number where the parsing ended.
+     */
+    private int parseHeader(List<String> records) {
+        headers = new HeaderArray(); // initialize headers
         
-        System.out.println(String.format("Size = %d   NumElements = %d\n\tnote 1 time: %f\n\tnote 2 time: %f", notes.size, notes.numElements, notes.data[0].time, notes.data[1].time));
+        int lineIndex = 0;
+        boolean end = false;
+        String line;
+        int endOfLabel;
         
-        HeaderArray headers = new HeaderArray();
+        while(!end) { // while header section hasn't ended
+            line = records.get(lineIndex); // get next line
+            if(!line.isEmpty()) {
+                if(line.charAt(0) == '#') { // if line begins a new label block
+                    Header tempHeader = new Header();
+                    endOfLabel = line.indexOf(':');
+                    tempHeader.type = line.substring(1, endOfLabel); // store the label type (ex: ARTIST)
+                    line = line.substring(endOfLabel + 1); // truncate off the label
+
+                    if(line.indexOf(';') == -1) { // if data for one label spans multiple lines
+                        do {
+                            line = line.concat(records.get(++lineIndex)); // concat next line to this line
+                        }
+                        while(records.get(lineIndex).indexOf(';') == -1);
+                    }
+
+                    tempHeader.data = line.replaceAll("[\\n\\t\\r\\;]", ""); // scrub the line of unwanted characters and store it
+                    if(tempHeader.data.isEmpty()) {
+                        tempHeader.isBlank = true;
+                    }
+                    headers.insert(tempHeader); // insert the completed header object
+                }
+                else if(line.charAt(0) == '/'){ // if found the start of a note section
+                    end = true;
+                    lineIndex --; // decrement to keep lineIndex where it is upon loop exit
+                }
+            }
+            lineIndex ++;
+        }
         
-        Header head1 = new Header();
-        head1.type = "ARTIST";
-        head1.data = "Trumpet63";
-        head1.isBlank = false;
-        
-        Header head2 = new Header();
-        head2.type = "TITLE";
-        head2.data = "";
-        head2.isBlank = true;
-        
-        headers.insert(head1);
-        headers.insert(head2);
-        
-        System.out.println(String.format("Size = %d   NumElements = %d\n\theader 1 type: %s\n\theader 2 type: %s", headers.size, headers.numElements, headers.data[0].type, headers.data[1].type));
+        headers.consolidate(); // save space by shrinking array size
+        return lineIndex; // return line where parsing stopped
     }
 }

@@ -10,6 +10,6 @@ public class Header {
     
     @Override
     public String toString() {
-        return String.format("Header::\n\ttype = %s\n\tdata = %s\n\tisBlank = %s\n\t", type, data, isBlank);
+        return String.format("Header::\n\ttype = %s\n\tdata = %s\n\tisBlank = %s\n", type, data, isBlank);
     }
 }

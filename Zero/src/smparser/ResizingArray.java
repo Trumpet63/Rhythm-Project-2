@@ -46,7 +46,7 @@ public abstract class ResizingArray<T> {
     
     // cannot create a new array in an abstract class unless you do something fancy
     /**
-     * Copies the elements in data into a new, presumably larger array.
+     * Copies the elements in data into a new array.
      * @param newSize Size of the array to copy data array into.
      */
     protected abstract void resize(int newSize);

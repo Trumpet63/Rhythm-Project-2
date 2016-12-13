@@ -2,7 +2,7 @@ package zero;
 import smparser.*;
 
 /**
- * @version 0.4 12/12/16
+ * @version 0.5 12/13/16
  * @author Trumpet63
  */
 public class Zero {

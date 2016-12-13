@@ -169,7 +169,7 @@ class Song {
      * @param records The .sm file broken into lines.
      */
     private void parseNotes(int currentMode, List<String> records) {
-        int scale = 10; // the digits of precision that the calculations will be carried out with
+        int scale = 20; // the digits of precision that the calculations will be carried out with
         int measureSize;
         int currentLineIndex = modes.data[currentMode].startLine; // the line in records at which the current mode's note data starts
         int currentBPMIndex = 0; // the index of the bpm that applies to the current line being processed
@@ -177,7 +177,7 @@ class Song {
         if(records.get(currentLineIndex).contains("/")) { // if the note data doesn't actually start at this line in records
             currentLineIndex ++; // the note data (probably) starts on the next line
         }
-        BPMArray bpms = parseBPMS(headers.find("bpms").data); // parse the bpms into a easier-to-use format
+        BPMArray bpms = parseBPMS(headers.find("bpms").data, scale); // parse the bpms into a easier-to-use format
         BigDecimal currentTime = new BigDecimal(headers.find("offset").data).negate().setScale(scale); // initialize current time to the negative of the offset
         BigDecimal currentBPM = new BigDecimal(bpms.data[0].bpm).setScale(scale); // initial bpm is always the first bpm given
         BigDecimal currentBeat = BigDecimal.ZERO.setScale(scale); // the first note starts at beat zero
@@ -217,7 +217,7 @@ class Song {
                 if(bpmChanges(nextBeat, bpms, scale, currentBPMIndex)) { // if the bpm changes between this line and the next
                     BigDecimal midBeat; // a beat number (given by a bpm change) part-way between current and next beat
                     do {
-                        midBeat = new BigDecimal(bpms.data[currentBPMIndex + 1].beat); // get the beat position of the upcoming bpm change
+                        midBeat = bpms.data[currentBPMIndex + 1].beat; // get the beat position of the upcoming bpm change
                         
                         // add: 60*(nextBeat - currentBeat)/currentBPM
                         currentTime = currentTime.add(new BigDecimal(60).setScale(scale).multiply(midBeat.subtract(currentBeat)).divide(currentBPM, RoundingMode.HALF_UP));
@@ -241,19 +241,57 @@ class Song {
      * @param bpmString The string of bpms parsed from the header.
      * @return An array of beat-bpm pairs.
      */
-    private BPMArray parseBPMS(String bpmString) {
+    private BPMArray parseBPMS(String bpmString, int scale) {
         BPMArray bpms = new BPMArray();
-        String[] bpmPairs = bpmString.split(",");
-        bpms.guaranteeSize(bpmPairs.length);
+        String[] bpmPairs = bpmString.split(","); // each bpm pair is separated by commas
+        bpms.guaranteeSize(bpmPairs.length); // since we know how many bpms we will store, it could save processing time to ensure there is enough space
         
-        for (String bpmPair : bpmPairs) {
-            String[] array = bpmPair.split("=");
-            BPM newBPM = new BPM();
-            newBPM.beat = array[0];
+        for (String bpmPair : bpmPairs) { // for each bpm pair, store them in the bpm array
+            String[] array = bpmPair.split("="); // each pair uses an equal sign as a delimiter
+            
+            /*
+            * Find the nearest fractional approximation with a denominator of
+            * 192 for the beat value for this bpm pair. Since DDReam assumes 
+            * that the beat value will be a fraction with 192 in its 
+            * denominator, this ensures that the parser's results will be (more 
+            * or less) consistent with DDReam.
+            */
+            int numerator;
+            int period = array[0].indexOf('.'); // find the decimal point in the beat value
+            if(period == -1) { // if there was no decimal point
+                numerator = 192*Integer.parseInt(array[0]); // get the numerator for this integer beat value
+            }
+            else { // there is a decimal point
+                // make the fraction match the integer part of the beat value
+                // assumes there will be an integer part, "0.1234" is ok, but ".1234" causes an error
+                numerator = 192*Integer.parseInt(array[0].substring(0, period));
+                
+                double goal = Double.parseDouble(array[0]); // set the goal to be the beat value
+                double currentGuess = (double)numerator/192; // the first guess is just the integer part
+                double difference = Math.abs(currentGuess - goal);
+                double bestDifference = difference;
+                boolean betterGuess = true;
+                while(betterGuess) { // while there might be a better guess
+                    currentGuess = (double)numerator/192; // get the double value for the guess
+                    difference = Math.abs(currentGuess - goal); // get the difference between the guess and the goal
+                    if(difference <= bestDifference) { // if this guess is no worse
+                        bestDifference = difference; // this difference is the best so far
+                        numerator ++; // get ready to try the next fraction
+                    }
+                    else { // this guess is worse
+                        betterGuess = false; // there will be no better guess
+                    }
+                }
+                numerator --; // decrement the numerator to get back to what was the best guess
+            } // end fractional approximation
+            
+            BPM newBPM = new BPM(); // build the bpm object
+            newBPM.beat = new BigDecimal(numerator).setScale(scale).divide(new BigDecimal(192).setScale(scale), RoundingMode.HALF_UP);
             newBPM.bpm = array[1];
-            bpms.insert(newBPM);
+            bpms.insert(newBPM); // store the bpm object
         }
         
+        // even though we guaranteed the size, the array might have been big enough already, so we save space if we can
         bpms.consolidate();
         
         return bpms;
@@ -299,7 +337,7 @@ class Song {
         BigDecimal nextBPMBeat; // the beat at which the next bpm starts
         
         if(currentBPMIndex != bpms.numElements - 1) { // if the current bpm index is not the last one in the bpms array (otherwise return false)
-            nextBPMBeat = new BigDecimal(bpms.data[currentBPMIndex + 1].beat).setScale(scale); // get the beat at which the next bpm starts
+            nextBPMBeat = bpms.data[currentBPMIndex + 1].beat; // get the beat at which the next bpm starts
             
             if(nextBPMBeat.compareTo(nextBeat) < 0) { // if the next bpm starts before the next line, then the bpm changes (otherwise return false)
                 bpmChanged = true;

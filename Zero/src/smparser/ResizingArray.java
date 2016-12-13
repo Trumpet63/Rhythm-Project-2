@@ -41,7 +41,9 @@ public abstract class ResizingArray<T> {
      * currently storing.
      */
     public void consolidate() {
-        resize(numElements);
+        if(size > numElements) {
+            resize(numElements);
+        }
     }
     
     // cannot create a new array in an abstract class unless you do something fancy

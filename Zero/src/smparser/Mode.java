@@ -12,10 +12,9 @@ public class Mode {
     String grooveRadar;
     
     /* The line number of the line in the file where the modes' note data
-    *  starts, where 0 is the first line of the file.
-    */
+    *  starts, where 0 is the first line of the file. */
     int startLine;
-    // toDo: noteData
+    TrackArray tracks;
     
     @Override
     public String toString() {

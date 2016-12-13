@@ -25,4 +25,22 @@ public class HeaderArray extends ResizingArray<Header> {
         data = newArray;
         size = newSize;
     }
+    
+    /**
+     * Does a linear search on the contents of data, matching the header type
+     * with the given type.
+     * @param typeKey Type to be found in the headers.
+     * @return The matched header, or null if no match was found.
+     */
+    public Header find(String typeKey) {
+        Header header = null;
+        boolean found = false;
+        for(int i = 0; i < numElements && !found; i++) {
+            if(data[i].type.compareToIgnoreCase(typeKey) == 0) {
+                header = data[i];
+                found = true;
+            }
+        }
+        return header;
+    }
 }

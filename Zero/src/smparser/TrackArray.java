@@ -1,20 +1,17 @@
 package smparser;
 
 /**
- * A resizing array of notes. Initial array size is hard-coded in its
- * constructor.
+ * A resizing array of note arrays, each corresponding to a track. Initial array
+ * size is hard-coded in its constructor.
  */
-public class NoteArray extends ResizingArray<Note> {
-    boolean isInitialized = false;
-    
+public class TrackArray extends ResizingArray<NoteArray> {
     /**
      * Constructs and initializes a note array object.
      */
-    NoteArray() {
+    TrackArray() {
         numElements = 0;
-        data = new Note[100];
-        size = 100;
-        isInitialized = true;
+        data = new NoteArray[4];
+        size = 4;
     }
     
     @Override
@@ -23,7 +20,7 @@ public class NoteArray extends ResizingArray<Note> {
      * @param newSize Size of the array to copy data array into.
      */
     protected void resize(int newSize) {
-        Note[] newArray = new Note[newSize];
+        NoteArray[] newArray = new NoteArray[newSize];
         System.arraycopy(data, 0, newArray, 0, numElements);
         data = newArray;
         size = newSize;

@@ -1,4 +1,4 @@
-package smparser;
+package song;
 
 /**
  * A resizing array of headers. Initial array size is hard-coded in its

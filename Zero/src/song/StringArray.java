@@ -1,17 +1,18 @@
-package smparser;
+package song;
 
 /**
- * A resizing array of note arrays, each corresponding to a track. Initial array
- * size is hard-coded in its constructor.
+ * A resizing array of strings. Initial array size is hard-coded in its
+ * constructor.
  */
-public class TrackArray extends ResizingArray<NoteArray> {
+public class StringArray extends ResizingArray<String> {
+    
     /**
      * Constructs and initializes a note array object.
      */
-    TrackArray() {
+    StringArray() {
         numElements = 0;
-        data = new NoteArray[4];
-        size = 4;
+        data = new String[64];
+        size = 64;
     }
     
     @Override
@@ -20,7 +21,7 @@ public class TrackArray extends ResizingArray<NoteArray> {
      * @param newSize Size of the array to copy data array into.
      */
     protected void resize(int newSize) {
-        NoteArray[] newArray = new NoteArray[newSize];
+        String[] newArray = new String[newSize];
         System.arraycopy(data, 0, newArray, 0, numElements);
         data = newArray;
         size = newSize;

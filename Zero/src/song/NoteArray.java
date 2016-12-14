@@ -1,17 +1,20 @@
-package smparser;
+package song;
 
 /**
- * A resizing array of modes. Initial array size is hard-coded in its
+ * A resizing array of notes. Initial array size is hard-coded in its
  * constructor.
  */
-public class ModeArray extends ResizingArray<Mode> {
+public class NoteArray extends ResizingArray<Note> {
+    boolean isInitialized = false;
+    
     /**
-     * Constructs and initializes a mode array object.
+     * Constructs and initializes a note array object.
      */
-    ModeArray() {
+    NoteArray() {
         numElements = 0;
-        data = new Mode[5];
-        size = 5;
+        data = new Note[100];
+        size = 100;
+        isInitialized = true;
     }
     
     @Override
@@ -20,7 +23,7 @@ public class ModeArray extends ResizingArray<Mode> {
      * @param newSize Size of the array to copy data array into.
      */
     protected void resize(int newSize) {
-        Mode[] newArray = new Mode[newSize];
+        Note[] newArray = new Note[newSize];
         System.arraycopy(data, 0, newArray, 0, numElements);
         data = newArray;
         size = newSize;

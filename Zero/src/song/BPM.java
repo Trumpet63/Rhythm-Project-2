@@ -1,4 +1,4 @@
-package smparser;
+package song;
 
 import java.math.BigDecimal;
 

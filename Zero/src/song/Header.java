@@ -1,4 +1,4 @@
-package smparser;
+package song;
 
 /**
  * Class that stores information describing a header.

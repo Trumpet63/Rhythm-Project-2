@@ -1,4 +1,4 @@
-package smparser;
+package song;
 
 /**
  * The resizing array allows for infinite, fast insertions. Useful when only
@@ -7,9 +7,9 @@ package smparser;
  * @param <T> The type of data the array will store
  */
 public abstract class ResizingArray<T> {
-    T[] data;
-    int size; // max number of elements array can hold
-    int numElements; // current number of elements in array
+    public T[] data;
+    public int size; // max number of elements array can hold
+    public int numElements; // current number of elements in array
     
     /**
      * Insert an item into the array. Insert triggers a resize when the array is

@@ -1,18 +1,18 @@
-package smparser;
+package song;
 
 /**
- * A resizing array of strings. Initial array size is hard-coded in its
+ * A resizing array of bpms. Initial array size is hard-coded in its
  * constructor.
  */
-public class StringArray extends ResizingArray<String> {
+public class BPMArray extends ResizingArray<BPM> {
     
     /**
-     * Constructs and initializes a note array object.
+     * Constructs and initializes a bpm array object.
      */
-    StringArray() {
+    BPMArray() {
         numElements = 0;
-        data = new String[64];
-        size = 64;
+        data = new BPM[10];
+        size = 10;
     }
     
     @Override
@@ -21,7 +21,7 @@ public class StringArray extends ResizingArray<String> {
      * @param newSize Size of the array to copy data array into.
      */
     protected void resize(int newSize) {
-        String[] newArray = new String[newSize];
+        BPM[] newArray = new BPM[newSize];
         System.arraycopy(data, 0, newArray, 0, numElements);
         data = newArray;
         size = newSize;

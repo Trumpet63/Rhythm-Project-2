@@ -1,20 +1,21 @@
-package smparser;
+package song;
 
 /**
  * 
  */
 public class Mode {
     // the five lines of data in the header of the notes label/tag
-    String chartType;
-    String description;
-    String difficulty;
-    int numericalMeter;
-    String grooveRadar;
+    public String chartType;
+    public String description;
+    public String difficulty;
+    public int numericalMeter;
+    public String grooveRadar;
     
     /* The line number of the line in the file where the modes' note data
     *  starts, where 0 is the first line of the file. */
-    int startLine;
-    TrackArray tracks;
+    public int startLine;
+    
+    public TrackArray tracks;
     
     @Override
     public String toString() {

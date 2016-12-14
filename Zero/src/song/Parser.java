@@ -1,4 +1,4 @@
-package smparser;
+package song;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -10,26 +10,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The song object contains the methods necessary to parse a song's .sm file and
- * stores the information therein.
+ * Parses the .sm file given by the song's fileName and stores the results in
+ * the calling song.
  */
-class Song {
-    public String fileName;
-    public HeaderArray headers;
-    public ModeArray modes;
-    public int currentMode;
+public class Parser {
+    private final String fileName;
+    private HeaderArray headers;
+    private ModeArray modes;
+    private int currentMode;
+    private final Song song;
     
-    /**
-     * Constructs and initializes a song object
-     * @param fileName The name of the .sm file for the song.
-     */
-    Song(String fileName) {
-        this.fileName = fileName;
+    public Parser(Song song) {
+        fileName = song.notesFileName;
+        headers = song.headers;
+        modes = song.modes;
+        currentMode = song.currentMode;
+        this.song = song;
     }
     
-    /**
-     * Parses the .sm file given by the song's fileName.
-     */
     public void parse() {
         List<String> records = new ArrayList<>();
         
@@ -60,6 +58,10 @@ class Song {
         
         // parse the notes for the current mode into that mode's track array
         parseNotes(currentMode, records);
+        
+        song.headers = headers;
+        song.modes = modes;
+        song.currentMode = currentMode;
     }
     
     /**
@@ -184,7 +186,6 @@ class Song {
         BigDecimal four = new BigDecimal(4).setScale(scale); // the number 4 is useful in the beatLength calculation
         
         StringArray measure; // array where each line is a line in the current measure
-        System.out.println("time       measurePosition  measureSize  columnNumber  bpm");
         while((measure = getNextMeasure(currentLineIndex, records)) != null) { // while there is a next measure, store it in the array
             if(!tracksInitialized) { // the current mode's tracks must be initialized (only runs once)
                 modes.data[currentMode].tracks = new TrackArray();
@@ -207,7 +208,6 @@ class Song {
                         newNote.measurePosition = noteNumber;
                         newNote.measureSize = measureSize;
                         modes.data[currentMode].tracks.data[colNumber].insert(newNote); // store the note in the proper track
-                        System.out.println(newNote.toString());
                     }
                 }
                 

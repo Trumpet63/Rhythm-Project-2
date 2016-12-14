@@ -1,18 +1,17 @@
-package smparser;
+package song;
 
 /**
- * A resizing array of bpms. Initial array size is hard-coded in its
+ * A resizing array of modes. Initial array size is hard-coded in its
  * constructor.
  */
-public class BPMArray extends ResizingArray<BPM> {
-    
+public class ModeArray extends ResizingArray<Mode> {
     /**
-     * Constructs and initializes a bpm array object.
+     * Constructs and initializes a mode array object.
      */
-    BPMArray() {
+    ModeArray() {
         numElements = 0;
-        data = new BPM[10];
-        size = 10;
+        data = new Mode[5];
+        size = 5;
     }
     
     @Override
@@ -21,7 +20,7 @@ public class BPMArray extends ResizingArray<BPM> {
      * @param newSize Size of the array to copy data array into.
      */
     protected void resize(int newSize) {
-        BPM[] newArray = new BPM[newSize];
+        Mode[] newArray = new Mode[newSize];
         System.arraycopy(data, 0, newArray, 0, numElements);
         data = newArray;
         size = newSize;

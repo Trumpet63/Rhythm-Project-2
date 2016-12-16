@@ -5,11 +5,10 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 
 /**
- * The song object contains the methods necessary to parse a song's .sm file and
- * stores the information therein.
+ * The song object contains the data of a song.
  */
 public class Song {
-    public String notesFileName;
+    public String notesFileName; // usually a .sm file
     public String musicFileName;
     public HeaderArray headers;
     public ModeArray modes;
@@ -41,6 +40,11 @@ public class Song {
         parser.parse();
     }
     
+    /**
+     * Construct the requisite media player object to be able to play the music.
+     * @param fileName The simpler version of the file path that is used to
+     * create the media player object.
+     */
     private void loadMusic(String fileName) {
         music = new MediaPlayer(
             new Media(

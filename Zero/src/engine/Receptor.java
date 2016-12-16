@@ -5,27 +5,24 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
- * Visual representation of a note parsed from the .sm file.
+ * Represents the current song time for a note track, and indicates to the
+ * player the correct time at which to press a button.
  */
-public class Note extends ImageView {
-    double time; // the time at which the note occurs in the song
+public class Receptor extends ImageView {
     
     /**
-     * Create an instance of the note object.
-     * @param time The time at which the note occurs in the song.
-     */
-    public Note(double time) {
-        this.time = time;
-    }
-    
-    /**
-     * Prepare the note to be displayed onscreen.
-     * @param rotation The angle at which the note's noteskin will be rotated.
+     * Creates an instance of a receptor object.
+     * @param x The x-coordinate of this receptor.
+     * @param y The y-coordinate of this receptor.
+     * @param rotation The angle at which the receptor's noteskin will be rotated.
      * @param fileName The name of the image file to use as the noteskin.
      */
-    public void initialize(double rotation, String fileName) {
+    public Receptor(double x, double y, double rotation, String fileName) {
+        this.setX(x);
+        this.setY(y);
         this.setRotate(rotation);
         loadImage(fileName);
+        this.setOpacity(.70); // by default the receptor will be slightly transparent
     }
     
     /**

@@ -17,11 +17,14 @@ public class Receptor extends ImageView {
      * @param rotation The angle at which the receptor's noteskin will be rotated.
      * @param fileName The name of the image file to use as the noteskin.
      */
-    public Receptor(double x, double y, double rotation, String fileName) {
-        this.setX(x);
-        this.setY(y);
-        this.setRotate(rotation);
+    public Receptor(double x, double y, double rotation, double size, String fileName) {
         loadImage(fileName);
+        double scaleFactor = size / this.getImage().getWidth();
+        this.setX(x - this.getImage().getWidth() / 2);
+        this.setY(y - this.getImage().getHeight() / 2);
+        this.setScaleX(scaleFactor);
+        this.setScaleY(scaleFactor);
+        this.setRotate(rotation);
         this.setOpacity(.70); // by default the receptor will be slightly transparent
     }
     

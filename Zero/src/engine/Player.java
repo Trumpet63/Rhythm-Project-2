@@ -13,11 +13,14 @@ public class Player {
     String noteSkin; // the file name for the image file to use for the notes
     double windowHeight; // preferred window height in pixels
     double windowWidth; // preferred window width in pixels
+    double windowPadding;
     double trackLength; // usually decided by window height or width depending on scroll direction
     double receptorLocation; // as a percentage of receptor length
-    double trackWidth; // as a percentage of the window width divided by the number of tracks
-    double noteSize; // as a percentage of track width
-    double trackSpacing; // as a percentage of track width
+    double noteSize; // in units of pixels
+    double trackSpacing; // in units of pixels
+    AccuracyRank[] accuracies;
+    double noteOffset;
+    double judgeOffset;
     
     /**
      * Creates an instance of the player object.

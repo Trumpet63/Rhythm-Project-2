@@ -21,11 +21,15 @@ public class Note extends ImageView {
     /**
      * Prepare the note to be displayed onscreen.
      * @param rotation The angle at which the note's noteskin will be rotated.
+     * @param size
      * @param fileName The name of the image file to use as the noteskin.
      */
-    public void initialize(double rotation, String fileName) {
+    public void initialize(double rotation, double size, String fileName) {
         this.setRotate(rotation);
         loadImage(fileName);
+        double scaleFactor = size / this.getImage().getWidth();
+        this.setScaleX(scaleFactor);
+        this.setScaleY(scaleFactor);
     }
     
     /**

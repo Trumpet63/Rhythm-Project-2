@@ -1,6 +1,11 @@
 package engine;
 
+import javafx.animation.Interpolator;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextAlignment;
 import song.Song;
 import song.NoteArray;
 
@@ -12,12 +17,8 @@ public class GamePane extends Pane {
     Player player;
     NoteTrack[] tracks;
     
-    // x and y position of upper left corner
-    double x;
-    double y;
-    
-    double width;
-    double height;
+    Text accuracyPopupText;
+    AccuracyPopup accuracyPopup;
     
     /**
      * Create an instance of a game-pane object.
@@ -30,19 +31,23 @@ public class GamePane extends Pane {
     }
     
     /**
-     * Initialize the game pane and the tracks to the pane.
-     * @param x The x-coordinate of this game's position.
-     * @param y The y-coordinate of this game's position.
+     * Initialize the game pane and the tracks belonging to the pane.
      * @param width The width of the screen space allotted for this game.
      * @param height The height of the screen space allotted for this game.
      */
-    public void initialize(double x, double y, double width, double height) {
+    public void initialize(double width, double height) {
         int numTracks = song.modes.data[song.currentMode].tracks.numElements;
         tracks = new NoteTrack[numTracks];
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+        setWidth(width);
+        setHeight(height);
+        
+        accuracyPopupText = new Text(-0.1*width + player.windowPadding, height/5, ""); // position the popup text
+        accuracyPopupText.setWrappingWidth(1.2*width); // ensure the text wrapping width spans the width of the screen
+        accuracyPopupText.setFont(Font.font("Verdana", FontWeight.BOLD, width/5)); // set the popup font
+        accuracyPopupText.setTextAlignment(TextAlignment.CENTER); // center the popup text
+        getChildren().add(accuracyPopupText); // add the popup to the pane
+        accuracyPopup = new AccuracyPopup(accuracyPopupText, 0.50); // create the animation that will manage the popup text
+        accuracyPopup.setInterpolator(Interpolator.EASE_OUT); // give the animation an "easing" behavior
         
         // create tracks for each of the tracks of notes that were parsed from the .sm file
         for(int trackNumber = 0; trackNumber < numTracks; trackNumber ++) { // for each track
@@ -58,8 +63,10 @@ public class GamePane extends Pane {
                     trackNotes,
                     player,
                     trackNumber, // so the track can tell which keybinding applies to it
-                    getTrackX((double)trackNumber/numTracks),
-                    y + height/2
+                    numTracks,
+                    getTrackX(trackNumber),
+                    height + player.noteSize / 2,
+                    this
                     );
             
             this.getChildren().add(tracks[trackNumber]); // display the note track (but there's nothing to display right now)
@@ -67,29 +74,15 @@ public class GamePane extends Pane {
     } // end initialize
     
     /**
-     * Sets the x-coordinate of this game's position.
-     * @param x The new x-coordinate of this game's position.
-     */
-    public void setX(double x) {
-        this.x = x;
-    }
-    
-    /**
-     * Sets the y-coordinate of this game's position.
-     * @param y The new x-coordinate of this game's position.
-     */
-    public void setY(double y) {
-        this.y = y;
-    }
-    
-    /**
      * Calculates the x-coordinate for a track's start position.
      * @param positionPercent The ratio between the track number (starts at
      * zero) and the total number of tracks.
      * @return The x-coordinate of the track's start position.
      */
-    private long getTrackX(double positionPercent) {
-        return Math.round(x + width*(positionPercent + 0.07));
+    private double getTrackX(int trackNumber) {
+        double trackX = player.noteSize / 2;
+        trackX += trackNumber * (player.trackSpacing + player.noteSize);
+        return trackX + player.windowPadding;
     }
     
     /**
@@ -109,5 +102,10 @@ public class GamePane extends Pane {
         for(NoteTrack track: tracks) {
             track.updateTo(currentTime);
         }
+    }
+    
+    public void causeAccuracyPopup(int accuracyRank, int trackNumber) {
+        accuracyPopup.initialize(player.accuracies[accuracyRank].textColor, player.accuracies[accuracyRank].name);
+        accuracyPopup.play();
     }
 }

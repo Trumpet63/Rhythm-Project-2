@@ -1,9 +1,12 @@
 package engine;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.FlowPane;
-import javafx.scene.media.MediaPlayer;
 import song.Song;
 
 /**
@@ -18,9 +21,13 @@ public class PlayPane extends FlowPane {
      * usually .sm.
      * @param musicFileName The name of the file containing the music/audio.
      */
-    public PlayPane(String noteFileName, String musicFileName) {
-        song = new Song(noteFileName, musicFileName);
-        song.parse();
+    public PlayPane(File[] files, int mode) {
+        try {
+            song = new Song(files[0].getCanonicalPath(), files[1].getCanonicalFile().getCanonicalPath());
+            song.parse(mode);
+        } catch (IOException ex) {
+            Logger.getLogger(PlayPane.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     /**
@@ -60,15 +67,15 @@ public class PlayPane extends FlowPane {
                 ((GamePane)nodeIn).startGame(); // start this game
             }
         }
-        
         song.music.setVolume(0.1); // set the music volume
         
         double endTime = song.music.getTotalDuration().toSeconds(); // the maximum length of time the games will last
         
         // create an update loop that will run every frame
         DrawController updateGames = new DrawController(getAllTracks(this));
-        
-        while(song.music.getStatus() != MediaPlayer.Status.READY) {} // wait unti the music is ready
+//        while(song.music.getStatus() != MediaPlayer.Status.READY) {
+//            System.out.println(song.music.getStatus());
+//        } // wait until the music is ready
         song.music.play(); // play the music
         updateGames.initializeStartTime(((double)System.nanoTime())/1000000000);
         updateGames.start(); // start running the update loop

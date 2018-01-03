@@ -28,16 +28,16 @@ public class Song {
         loadMusic(musicFileName);
     }
     
-//    public Song(String fileName, int mode) {
-//        this.fileName = fileName;
-//        parser = new Parser(this);
-//    }
+    public void getInfo() {
+        parser.preParse();
+    }
     
     /**
      * Parses the .sm file given by the song's fileName.
+     * @param mode
      */
-    public void parse() {
-        parser.parse();
+    public void parse(int mode) {
+        parser.parse(mode);
     }
     
     /**

@@ -19,6 +19,9 @@ public class Parser {
     private ModeArray modes;
     private int currentMode;
     private final Song song;
+    List<String> records;
+    int endOfHeader;
+    boolean isPreParsed = false;
     
     public Parser(Song song) {
         fileName = song.notesFileName;
@@ -28,8 +31,9 @@ public class Parser {
         this.song = song;
     }
     
-    public void parse() {
-        List<String> records = new ArrayList<>();
+    // parse basic info about the song to inform the user
+    public void preParse() {
+        records = new ArrayList<>();
         
         // read the contents of the .sm file into records line-by-line
         try {
@@ -48,20 +52,25 @@ public class Parser {
         }
         
         // parse the header into the header array and get the line at which the headers ended
-        int endOfHeader = parseHeader(records);
+        this.endOfHeader = parseHeader(records);
         
         // parse the mode information from each mode present in the file into the mode array
         parseModes(endOfHeader, records);
         
-        // set the current mode to the last mode (temporary)
-        currentMode = modes.numElements - 1;
+        song.headers = headers;
+        song.modes = modes;
+    }
+    
+    public void parse(int mode) {
+        if(!isPreParsed) {
+            preParse();
+        }
+        
+        this.currentMode = mode;
+        song.currentMode = mode;
         
         // parse the notes for the current mode into that mode's track array
         parseNotes(currentMode, records);
-        
-        song.headers = headers;
-        song.modes = modes;
-        song.currentMode = currentMode;
     }
     
     /**
